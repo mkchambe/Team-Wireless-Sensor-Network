@@ -807,20 +807,20 @@ void loop () {
   int16_t delta;
   int16_t PTerm = 0,ITerm = 0,DTerm, PTermACC, ITermACC;
   static int16_t lastGyro[2] = {
-    0,0      };
+    0,0        };
   static int16_t errorAngleI[2] = {
-    0,0      };
+    0,0        };
 #if PID_CONTROLLER == 1
   static int32_t errorGyroI_YAW;
   static int16_t delta1[2],delta2[2];
   static int16_t errorGyroI[2] = {
-    0,0      };
+    0,0        };
 #elif PID_CONTROLLER == 2
   static int16_t delta1[3],delta2[3];
   static int32_t errorGyroI[3] = {
-    0,0,0      };
+    0,0,0        };
   static int16_t lastError[3] = {
-    0,0,0      };
+    0,0,0        };
   int16_t deltaSum;
   int16_t AngleRateTmp, RateError;
 #endif
@@ -858,8 +858,8 @@ void loop () {
     failsafeCnt++;
 #endif
     // end of failsafe routine - next change is made with RcOptions setting
-    
-    
+
+
     ///////////////////////////////////////////////////////////////Algae Bloom Deadband and account for PWM//////////////////////////////////////////////////////////////////
     //Account for PWM discrete values
     for(i = 0; i<4; i++){
@@ -882,23 +882,28 @@ void loop () {
       }
     }/*
     if((axisPID[ROLL] == 0 || avgOut[ROLL] == 0) && rcData[ROLL] != 1500){
-      rcData[ROLL] = 1500;
+     rcData[ROLL] = 1500;
+     }
+     if((axisPID[PITCH] == 0 || avgOut[PITCH] == 0) && rcData[ROLL] != 1500){
+     rcData[PITCH] = 1500;
+     }*/
+    if (rcData[THROTTLE] > 1100 && f.ARMED){ // If throttle is high enough to fly, check if quad needs a small roll or pitch push
+      if(rcData[ROLL]  == 1500 && axisPID[ROLL] != 0){
+        rcData[ROLL] += (axisPID[ROLL]/4);
+      }
+      if(rcData[PITCH] == 1500 && axisPID[PITCH] != 0){
+        rcData[PITCH] += (axisPID[PITCH]/4);
+      }
+    if(axisPID[ROLL] > 30 || axisPID[ROLL] < -30)
+       rcData[ROLL] += (axisPID[ROLL]/2);
+
+       if(axisPID[PITCH] > 30 || axisPID[PITCH] < -30)
+       rcData[PITCH] += (axisPID[PITCH]/2);
+       
+
     }
-    if((axisPID[PITCH] == 0 || avgOut[PITCH] == 0) && rcData[ROLL] != 1500){
-      rcData[PITCH] = 1500;
-    }*//*
-    if (rcData[THROTTLE] > 1200){ // If throttle is high enough to fly, check if quad needs a small roll or pitch push
-      if(rcData[ROLL]  == 1500){
-        if(axisPID[ROLL] != 0){
-          rcData[ROLL] += (axisPID[ROLL]/4);
-        }
-      }
-      if(rcData[PITCH] == 1500){
-        if(axisPID[PITCH] != 0){
-          rcData[PITCH] += (axisPID[PITCH]/4);
-        }
-      }
-    }*/
+
+
     ///////////////////////////////////////////////////////////////Algae Bloom end//////////////////////////////////////////////////////////////////
 
     // ------------------ STICKS COMMAND HANDLER --------------------
@@ -1527,6 +1532,7 @@ void loop () {
   if ( (f.ARMED) || ((!calibratingG) && (!calibratingA)) ) writeServos();
   writeMotors();
 }
+
 
 
 
